@@ -1,0 +1,57 @@
+{
+  "floors": [
+    {
+      "shape": "rect",
+      "type": "platform",
+      "x": 0,
+      "y": 350,
+      "width": 360,
+      "height": 10
+    }
+  ],
+  "walls": [
+  ],
+  "spikes": [
+    {
+      "shape": "triangle",
+      "type": "spike",
+      "scale": 25,
+      "internal_angle": 45,
+      "rotation": 0,
+      "x": 50,
+      "y": 150,
+      "rotor": true,
+      "angle": 5
+    },
+    {
+      "shape": "triangle",
+      "type": "spike",
+      "scale": 35,
+      "internal_angle": 45,
+      "rotation": 0,
+      "x": 150,
+      "y": 150,
+      "rotor": true,
+      "angle": 5
+    },
+    {
+      "shape": "triangle",
+      "type": "spike",
+      "scale": 15,
+      "internal_angle": 45,
+      "rotation": 0,
+      "x": 435,
+      "y": 450,
+      "rotor": true,
+      "angle": 5
+    }
+  ],
+  "finish": {
+    "shape": "rect",
+    "type": "finish",
+    "x": 630,
+    "y": 350,
+    "width": 100,
+    "height": 10
+  }
+}

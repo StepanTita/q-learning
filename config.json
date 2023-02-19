@@ -1,0 +1,23 @@
+{
+  "start_level": "1",
+  "drawer": {
+    "screen": {
+      "width": 720,
+      "height": 480
+    }
+  },
+  "sprites": {
+    "player": {
+      "x": 50,
+      "y": 250,
+      "width": 75,
+      "height": 75,
+      "step": 2,
+      "weight": 0.25,
+      "jump_height": 15
+    }
+  },
+  "physics": {
+    "gravity": 2
+  }
+}
