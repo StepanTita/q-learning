@@ -8,9 +8,8 @@ class Physics:
         self.bound_w = bounds_config['width']
         self.bound_h = bounds_config['height']
 
-    def gravity(self, sprite, floors: pygame.sprite.Group):
-        if not sprite.is_jumping and not pygame.sprite.spritecollideany(sprite, floors):
-            sprite.fall(self.g)
+    def gravity(self, sprite, game_field):
+        sprite.fall(self.g, game_field)
 
     def bounds(self, sprite: pygame.sprite.Sprite):
         # sprite.rect.update(
@@ -32,8 +31,8 @@ class Physics:
              sprite.rect.height))
         return out_bounds
 
-    def apply(self, player, floors):
+    def apply(self, player, game_field):
         game_state = dict()
-        self.gravity(player, floors)
+        self.gravity(player, game_field)
         game_state['out_bounds'] = self.bounds(player)
         return game_state

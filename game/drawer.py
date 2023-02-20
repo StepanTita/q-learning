@@ -15,6 +15,8 @@ def dir_to_rect(last_dir, w, h):
         return w // 2, h // 2 - h // shrink_coef // 2, w // 2, h // shrink_coef
     elif last_dir == Direction.STAY:
         return w // 2 - w // shrink_coef // 2, h // 2 - h // shrink_coef // 2, w // shrink_coef, h // shrink_coef
+    else:
+        return None
 
 
 class Drawer:

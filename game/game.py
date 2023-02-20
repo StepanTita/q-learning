@@ -1,17 +1,17 @@
+import numpy as np
 import pygame.sprite
 
 from constants import Action, action_to_direction, GameStatus
-from levels.levels import read_level
+from field.field import GameField
 from game.drawer import Drawer
 from game.eventer import Eventer
+from levels.levels import read_level
 from physics.physics import Physics
 from sprites.finish import Finish
 from sprites.floor import Floor
 from sprites.player import Player
 from sprites.spike import Spike
 from sprites.wall import Wall
-
-import numpy as np
 
 
 def dist(pA, pB):
@@ -41,32 +41,72 @@ class Game:
         self.player = Player(config['sprites']['player'], config['physics']['gravity'])
         self.finish = Finish(self.level['finish'])
 
-        self.floors = pygame.sprite.Group()
-        self.floors.add([Floor(cfg) for cfg in self.level['floors']])
-
-        self.walls = pygame.sprite.Group()
-        self.walls.add([Wall(cfg) for cfg in self.level['walls']])
+        self._prebuild_borders()
 
         self.spikes = pygame.sprite.Group()
         self.spikes.add([Spike(cfg) for cfg in self.level['spikes']])
 
         self.game_objects = pygame.sprite.Group()
         self.game_objects.add(self.spikes)
-        self.game_objects.add(self.floors)
         self.game_objects.add(self.walls)
+        self.game_objects.add(self.floors)
         self.game_objects.add(self.player)
         self.game_objects.add(self.finish)
 
         self.initial_dist = dist(self.player.rect.center, self.finish.rect.center)
 
+    def _prebuild_borders(self):
+        self.floors = pygame.sprite.Group()
+        self.floors.add([Floor(cfg) for cfg in self.level['floors']])
+
+        self.walls = pygame.sprite.Group()
+        self.walls.add([Wall(cfg) for cfg in self.level['walls']])
+
+        new_walls = []
+        for floor in self.floors:
+            new_walls.append(Wall({
+                'x': floor.rect.left,
+                'y': floor.rect.top + 1,
+                'width': 1,
+                'height': floor.rect.height - 2,
+                'color': 'red',
+            }))
+            new_walls.append(Wall({
+                'x': floor.rect.right,
+                'y': floor.rect.top + 1,
+                'width': 1,
+                'height': floor.rect.height - 2,
+                'color': 'red',
+            }))
+
+        new_floors = []
+        for wall in self.walls:
+            new_floors.append(Floor({
+                'x': wall.rect.left + 1,
+                'y': wall.rect.top,
+                'width': wall.rect.width - 2,
+                'height': 1,
+                'color': 'red',
+            }))
+            new_floors.append(Floor({
+                'x': wall.rect.left + 1,
+                'y': wall.rect.bottom,
+                'width': wall.rect.width - 2,
+                'height': 1,
+                'color': 'red',
+            }))
+        self.walls = [*self.walls, *new_walls]
+        self.floors = [*self.floors, *new_floors]
+
     def _run_step(self, game_state):
         self.running = game_state['running']
 
-        if game_state['player_move'] not in self.player.cannot_move_dirs(self.floors, self.walls):
-            self.player.move(game_state['player_move'])
+        game_field = GameField(self.walls, self.floors, self.spikes)
+
+        self.player.move(game_state['player_move'], game_field)
 
         if game_state['player_jump'] or self.player.is_jumping:
-            self.player.jump(self.player.cannot_move_dirs(self.floors, self.walls))
+            self.player.jump(game_field)
 
         for spike in self.spikes:
             spike.rotate()
@@ -79,7 +119,7 @@ class Game:
             self.running = False
             return GameStatus.LOST
 
-        game_state = self.physics.apply(self.player, self.floors)
+        game_state = self.physics.apply(self.player, game_field)
         if game_state['out_bounds']:
             self.running = False
             return GameStatus.LOST
@@ -87,9 +127,15 @@ class Game:
         self.drawer.draw(self.game_objects)
         return GameStatus.PLAYING
 
-    def _calc_reward(self, game_status):
-        return -dist(self.player.rect.center, self.finish.rect.center) / self.initial_dist * (
-            -5 if game_status == GameStatus.WIN else 5 if game_status == GameStatus.LOST else 1)
+    def _action_to_game_state(self, action):
+        return {
+            'running': self.running,
+            'player_move': action_to_direction(action),
+            'player_jump': action == Action.JUMP,
+        }
+
+    def _calc_reward(self):
+        return -dist(self.player.rect.center, self.finish.rect.center) / self.initial_dist
 
     def run(self):
         self.running = True
@@ -100,13 +146,6 @@ class Game:
             game_state = self.eventer.listen()
 
             self._run_step(game_state)
-
-    def _action_to_game_state(self, action):
-        return {
-            'running': self.running,
-            'player_move': action_to_direction(action),
-            'player_jump': action == Action.JUMP,
-        }
 
     async def run_async(self, action):
         self.running = True
@@ -121,7 +160,7 @@ class Game:
             game_status = self._run_step(game_state)
             done = game_status in [GameStatus.WIN, GameStatus.LOST]
 
-            reward = self._calc_reward(game_status)
+            reward = self._calc_reward()
 
             yield next_state, reward, done
             next_state += 1
