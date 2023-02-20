@@ -31,7 +31,7 @@ class Drawer:
             if game_obj.shape == 'rect':
                 surf, rect, last_dir = game_obj.get_state()
                 if last_dir is not None:
-                    surf.fill(Color.BLACK)
+                    surf.fill(game_obj.color)
                     pygame.draw.rect(surf, Color.RED, pygame.Rect(*dir_to_rect(last_dir, rect.width, rect.height)))
                 self.screen.blit(surf, rect)
             elif game_obj.shape == 'triangle':

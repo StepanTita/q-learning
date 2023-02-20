@@ -31,14 +31,12 @@ class Agent:
 
         self.env = env
 
-    # TODO: penalize path
     async def training(self, epochs):
         for e in range(1, epochs + 1):
             print('*' * 30, f'Starting epoch: {e}...', '*' * 30)
             state = self.env.reset()
 
             steps, penalties, reward, = 0, 0, 0
-            result_bonus = 10
 
             actions = []
 
@@ -54,9 +52,6 @@ class Agent:
                 if next_state > len(self.q_table):
                     print('----> Failed to find the way...')
                     break
-
-                if reward < -2:
-                    penalties += reward
 
                 old_value = self.q_table[state, action]
                 next_max = np.max(self.q_table[next_state])

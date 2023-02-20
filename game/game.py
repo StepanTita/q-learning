@@ -1,23 +1,18 @@
-import numpy as np
 import pygame.sprite
 
 from constants import Action, action_to_direction, GameStatus
 from field.field import GameField
 from game.drawer import Drawer
 from game.eventer import Eventer
+from game.reward import Reward
 from levels.levels import read_level
 from physics.physics import Physics
+from sprites.enemy import Enemy
 from sprites.finish import Finish
 from sprites.floor import Floor
 from sprites.player import Player
 from sprites.spike import Spike
 from sprites.wall import Wall
-
-
-def dist(pA, pB):
-    return np.linalg.norm(np.array(pA) -
-                          np.array(pB))
-
 
 FPS = 120
 
@@ -31,9 +26,10 @@ class Game:
         self.eventer = Eventer()
 
         self.level = read_level(base_path, config['start_level'])
-        self._init_level(config)
 
         self.physics = Physics(config['physics'], config['drawer']['screen'])
+
+        self._init_level(config)
 
         self.running = False
 
@@ -46,14 +42,19 @@ class Game:
         self.spikes = pygame.sprite.Group()
         self.spikes.add([Spike(cfg) for cfg in self.level['spikes']])
 
+        self.enemies = pygame.sprite.Group()
+        self.enemies.add([Enemy(cfg, self.physics.g) for cfg in self.level['enemies']])
+
         self.game_objects = pygame.sprite.Group()
         self.game_objects.add(self.spikes)
         self.game_objects.add(self.walls)
         self.game_objects.add(self.floors)
+        self.game_objects.add(self.enemies)
         self.game_objects.add(self.player)
         self.game_objects.add(self.finish)
 
-        self.initial_dist = dist(self.player.rect.center, self.finish.rect.center)
+        self.reward = Reward()
+        self.reward.set_start_goal(self.player, self.finish)
 
     def _prebuild_borders(self):
         self.floors = pygame.sprite.Group()
@@ -119,7 +120,7 @@ class Game:
             self.running = False
             return GameStatus.LOST
 
-        game_state = self.physics.apply(self.player, game_field)
+        game_state = self.physics.apply([self.player, *self.enemies], game_field)
         if game_state['out_bounds']:
             self.running = False
             return GameStatus.LOST
@@ -133,9 +134,6 @@ class Game:
             'player_move': action_to_direction(action),
             'player_jump': action == Action.JUMP,
         }
-
-    def _calc_reward(self):
-        return -dist(self.player.rect.center, self.finish.rect.center) / self.initial_dist
 
     def run(self):
         self.running = True
@@ -160,7 +158,7 @@ class Game:
             game_status = self._run_step(game_state)
             done = game_status in [GameStatus.WIN, GameStatus.LOST]
 
-            reward = self._calc_reward()
+            reward = self.reward.calc_reward()
 
             yield next_state, reward, done
             next_state += 1

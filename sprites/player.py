@@ -3,7 +3,7 @@ from collections import namedtuple
 import pygame
 
 from constants import Direction
-from field.field import GameField
+from sprites.mover import Mover
 from sprites.sprite import Spriter
 
 Circle = namedtuple("Circle", "pos radius")
@@ -20,35 +20,16 @@ def inverse_dir(move_dir):
         return Direction.UP
 
 
-class Player(pygame.sprite.Sprite, Spriter):
+class Player(pygame.sprite.Sprite, Spriter, Mover):
     def __init__(self, config, g):
         pygame.sprite.Sprite.__init__(self)
         Spriter.__init__(self, config)
+        Mover.__init__(self, config, g)
 
         self.is_jumping = False
-        self.is_falling = False
-
-        self.step = config['step']
-        self.weight = config['weight']
-        self.g = g
 
         self.jump_height = config['jump_height']
         self.yv = self.jump_height
-
-        self.last_dir = None
-
-    def move(self, move_dir: Direction, game_field, by=None):
-        self.last_dir = move_dir
-        if move_dir in self._cannot_move_dirs(game_field):
-            return
-        if move_dir == Direction.UP:
-            self.rect.move_ip((0, -self.step if by is None else by))
-        elif move_dir == Direction.DOWN:
-            self.rect.move_ip((0, self.step if by is None else by))
-        elif move_dir == Direction.LEFT:
-            self.rect.move_ip((-self.step if by is None else by, 0))
-        elif move_dir == Direction.RIGHT:
-            self.rect.move_ip((self.step if by is None else by, 0))
 
     def _move_dirs(self, x, y):
         dirs_list = []
@@ -61,32 +42,10 @@ class Player(pygame.sprite.Sprite, Spriter):
             dirs_list.append(Direction.UP)
         elif y > 0:
             dirs_list.append(Direction.DOWN)
+
+        if len(dirs_list) == 0:
+            dirs_list.append(Direction.STAY)
         return dirs_list
-
-    def _cannot_move_dirs(self, game_field: GameField):
-        blocked_dirs = []
-
-        for floor in game_field.floors:
-            if self.rect.colliderect(floor.rect):
-                if self.rect.centery > floor.rect.bottom >= self.rect.top:
-                    blocked_dirs.append(Direction.UP)
-                elif self.rect.centery < floor.rect.top <= self.rect.bottom:
-                    blocked_dirs.append(Direction.DOWN)
-
-        left_walls = []
-        right_walls = []
-        for wall in game_field.walls:
-            if self.rect.right <= wall.rect.centerx:
-                right_walls.append(wall)
-            if self.rect.left >= wall.rect.centerx:
-                left_walls.append(wall)
-
-        if pygame.sprite.spritecollideany(self, pygame.sprite.Group(left_walls)):
-            blocked_dirs.append(Direction.LEFT)
-        if pygame.sprite.spritecollideany(self, pygame.sprite.Group(right_walls)):
-            blocked_dirs.append(Direction.RIGHT)
-
-        return blocked_dirs
 
     def jump(self, game_field):
         if not self.is_falling and not self.is_jumping:
@@ -94,7 +53,7 @@ class Player(pygame.sprite.Sprite, Spriter):
             self.step *= 2
         if self.is_jumping:
             self.yv -= self.g * self.weight
-            if self.yv > -self.jump_height and self.yv != 0:
+            if self.yv > -self.jump_height:
                 self.move(self._move_dirs(0, -self.yv)[0], game_field, by=-self.yv)
             else:
                 self._end_jump()

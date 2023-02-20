@@ -6,7 +6,8 @@ from constants import Color
 class Spriter:
     def __init__(self, config):
         self.surf = pygame.Surface((config.get('width', 50), config.get('height', 50)))
-        self.surf.fill(config.get('color', Color.BLACK))
+        self.color = config.get('color', Color.BLACK)
+        self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
         self.shape = config.get('shape', 'rect')
 
