@@ -1,4 +1,8 @@
+from typing import List
+
 import pygame.sprite
+
+from sprites.player import Player
 
 
 class Physics:
@@ -8,32 +12,38 @@ class Physics:
         self.bound_w = bounds_config['width']
         self.bound_h = bounds_config['height']
 
-    def gravity(self, sprite, floors: pygame.sprite.Group):
-        if not sprite.is_jumping and not pygame.sprite.spritecollideany(sprite, floors):
-            sprite.fall(self.g)
+    def gravity(self, movers, game_field):
+        for mover in movers:
+            mover.fall(self.g, game_field)
 
-    def bounds(self, sprite: pygame.sprite.Sprite):
+    def bounds(self, movers: List[pygame.sprite.Sprite]):
         # sprite.rect.update(
         #     (sprite.rect.left % self.bound_w, sprite.rect.top % self.bound_h, sprite.rect.width, sprite.rect.height))
 
-        sprite.rect.update(
-            (max(0, sprite.rect.left), max(0, sprite.rect.top), sprite.rect.width, sprite.rect.height))
-
-        left = sprite.rect.left
-        top = sprite.rect.top
         out_bounds = False
-        if sprite.rect.right > self.bound_w:
-            left = self.bound_w - sprite.rect.width
-        if sprite.rect.bottom > self.bound_h:
-            top = self.bound_h - sprite.rect.height
-            out_bounds = True
-        sprite.rect.update(
-            (left, top, sprite.rect.width,
-             sprite.rect.height))
+
+        for mover in movers:
+            mover.rect.update(
+                (max(0, mover.rect.left), max(0, mover.rect.top), mover.rect.width, mover.rect.height))
+
+            left = mover.rect.left
+            top = mover.rect.top
+
+            if mover.rect.right > self.bound_w:
+                left = self.bound_w - mover.rect.width
+            if mover.rect.bottom > self.bound_h:
+                top = self.bound_h - mover.rect.height
+                if isinstance(mover, Player):
+                    out_bounds = True
+                else:
+                    mover.kill()
+            mover.rect.update(
+                (left, top, mover.rect.width,
+                 mover.rect.height))
         return out_bounds
 
-    def apply(self, player, floors):
+    def apply(self, movers, game_field):
         game_state = dict()
-        self.gravity(player, floors)
-        game_state['out_bounds'] = self.bounds(player)
+        self.gravity(movers, game_field)
+        game_state['out_bounds'] = self.bounds(movers)
         return game_state

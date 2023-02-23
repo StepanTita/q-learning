@@ -15,8 +15,7 @@
       "y": 450,
       "width": 100,
       "height": 10
-    }
-    ,
+    },
     {
       "shape": "rect",
       "type": "platform",
@@ -85,6 +84,19 @@
       "y": 450,
       "rotor": true,
       "angle": 5
+    }
+  ],
+  "enemies": [
+    {
+      "shape": "rect",
+      "type": "enemy",
+      "color": "darkgrey",
+      "x": 450,
+      "y": 50,
+      "width": 50,
+      "height": 75,
+      "step": 1,
+      "weight": 0.25
     }
   ],
   "finish": {

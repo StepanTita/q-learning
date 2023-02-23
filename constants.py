@@ -10,7 +10,6 @@ class Color:
     WHITE = (255, 255, 255)
     BLACK = (0, 0, 0)
     GREY = (127, 127, 127)
-    TRANSPARENT = (0, 0, 0, 0)
 
 
 class Direction(Enum):
@@ -39,4 +38,6 @@ def action_to_direction(action):
         return Direction.LEFT
     elif action == Action.MOVE_RIGHT:
         return Direction.RIGHT
+    elif action == Action.STAY:
+        return Direction.STAY
     return None

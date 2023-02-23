@@ -2,7 +2,7 @@ import pygame
 
 
 class Graviter:
-    def fall(self, g) -> pygame.Rect:
+    def fall(self, g, *args) -> pygame.Rect:
         """
 
         :param g: gravity force

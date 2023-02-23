@@ -15,6 +15,8 @@ def dir_to_rect(last_dir, w, h):
         return w // 2, h // 2 - h // shrink_coef // 2, w // 2, h // shrink_coef
     elif last_dir == Direction.STAY:
         return w // 2 - w // shrink_coef // 2, h // 2 - h // shrink_coef // 2, w // shrink_coef, h // shrink_coef
+    else:
+        return None
 
 
 class Drawer:
@@ -29,7 +31,7 @@ class Drawer:
             if game_obj.shape == 'rect':
                 surf, rect, last_dir = game_obj.get_state()
                 if last_dir is not None:
-                    surf.fill(Color.BLACK)
+                    surf.fill(game_obj.color)
                     pygame.draw.rect(surf, Color.RED, pygame.Rect(*dir_to_rect(last_dir, rect.width, rect.height)))
                 self.screen.blit(surf, rect)
             elif game_obj.shape == 'triangle':

@@ -2,14 +2,14 @@
   "start_level": "1",
   "drawer": {
     "screen": {
-      "width": 720,
-      "height": 480
+      "width": 1080,
+      "height": 720
     }
   },
   "sprites": {
     "player": {
       "x": 50,
-      "y": 250,
+      "y": 550,
       "width": 75,
       "height": 75,
       "step": 2,
