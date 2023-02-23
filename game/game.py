@@ -17,6 +17,17 @@ from sprites.wall import Wall
 FPS = 120
 
 
+def state_iteration(f):
+    def wrapper(ref, *args):
+        if not hasattr(ref, 'next_state'):
+            ref.next_state = 1
+        else:
+            ref.next_state += 1
+        return f(ref, *args)
+
+    return wrapper
+
+
 class Game:
     def __init__(self, base_path, config):
         self.base_path = base_path
@@ -53,7 +64,7 @@ class Game:
         self.game_objects.add(self.player)
         self.game_objects.add(self.finish)
 
-        self.reward = Reward()
+        self.reward = Reward(metric='manhattan')
         self.reward.set_start_goal(self.player, self.finish)
 
     def _prebuild_borders(self):
@@ -145,23 +156,21 @@ class Game:
 
             self._run_step(game_state)
 
-    async def run_async(self, action):
+    @state_iteration
+    def run_async(self, action):
         self.running = True
 
         clock = pygame.time.Clock()
 
-        next_state = 1
-        while self.running:
+        if self.running:
             clock.tick(FPS)
             game_state = self._action_to_game_state(action)
 
             game_status = self._run_step(game_state)
-            done = game_status in [GameStatus.WIN, GameStatus.LOST]
 
             reward = self.reward.calc_reward()
 
-            yield next_state, reward, done
-            next_state += 1
+            return self.next_state, reward, game_status
 
     def clone(self):
         return Game(self.base_path, self.config)

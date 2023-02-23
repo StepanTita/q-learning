@@ -4,16 +4,48 @@
       "shape": "rect",
       "type": "platform",
       "x": 0,
-      "y": 350,
-      "width": 360,
+      "y": 650,
+      "width": 150,
       "height": 10
     },
     {
       "shape": "rect",
       "type": "platform",
-      "x": 350,
-      "y": 150,
-      "width": 360,
+      "x": 200,
+      "y": 550,
+      "width": 100,
+      "height": 10
+    },
+    {
+      "shape": "rect",
+      "type": "platform",
+      "x": 300,
+      "y": 450,
+      "width": 100,
+      "height": 10
+    },
+    {
+      "shape": "rect",
+      "type": "platform",
+      "x": 450,
+      "y": 400,
+      "width": 100,
+      "height": 10
+    },
+    {
+      "shape": "rect",
+      "type": "platform",
+      "x": 600,
+      "y": 650,
+      "width": 150,
+      "height": 10
+    },
+    {
+      "shape": "rect",
+      "type": "platform",
+      "x": 700,
+      "y": 450,
+      "width": 200,
       "height": 10
     }
   ],
@@ -21,18 +53,10 @@
     {
       "shape": "rect",
       "type": "wall",
-      "x": 0,
-      "y": 250,
+      "x": 800,
+      "y": 400,
       "width": 10,
-      "height": 100
-    },
-    {
-      "shape": "rect",
-      "type": "wall",
-      "x": 350,
-      "y": 250,
-      "width": 10,
-      "height": 100
+      "height": 300
     }
   ],
   "spikes": [
@@ -42,19 +66,19 @@
       "scale": 25,
       "internal_angle": 45,
       "rotation": 0,
-      "x": 50,
-      "y": 150,
+      "x": 150,
+      "y": 575,
       "rotor": true,
       "angle": 5
     },
     {
       "shape": "triangle",
       "type": "spike",
-      "scale": 35,
+      "scale": 25,
       "internal_angle": 45,
       "rotation": 0,
-      "x": 150,
-      "y": 150,
+      "x": 555,
+      "y": 425,
       "rotor": true,
       "angle": 5
     },
@@ -64,30 +88,19 @@
       "scale": 15,
       "internal_angle": 45,
       "rotation": 0,
-      "x": 435,
-      "y": 450,
+      "x": 555,
+      "y": 570,
       "rotor": true,
       "angle": 5
     }
   ],
   "enemies": [
-    {
-      "shape": "rect",
-      "type": "enemy",
-      "color": "darkgrey",
-      "x": 450,
-      "y": 50,
-      "width": 50,
-      "height": 75,
-      "step": 1,
-      "weight": 0.25
-    }
   ],
   "finish": {
     "shape": "rect",
     "type": "finish",
-    "x": 630,
-    "y": 350,
+    "x": 950,
+    "y": 650,
     "width": 100,
     "height": 10
   }
