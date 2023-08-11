@@ -7,7 +7,11 @@ We also introduce the concept of **reward backpropagation** in this project.
 More precise description of the solution and full report please find in the [REPORT](report.pdf)
 
 ## Demo:
-![Game Demo](path_to_game_demo_gif_or_screenshot)
+
+
+https://github.com/StepanTita/q-learning/assets/44279105/f73161c0-a61a-4915-9b8b-e93fbdd7c867
+
+
 
 ## Features 🚀
 - **Q-Learning Powered**: Experience a game environment influenced by Q-Learning.
